@@ -40,20 +40,23 @@ RUN export USE_CUDA=0
 
 ARG CUDA_VERSION=""
 
-RUN TORCH_VER=1.10.2 && \
-    TORCH_VISION_VER=0.13.1 && \
-    if echo "$BASE_IMAGE" | grep -q "cuda:"; then \
-        # Install CUDA version specific binary when CUDA version is specified as a build arg
-        if [ "$CUDA_VERSION" ]; then \
-            pip install --no-cache-dir torch==$TORCH_VER+$CUDA_VERSION torchvision==$TORCH_VISION_VER+$CUDA_VERSION -f https://download.pytorch.org/whl/torch_stable.html; \
-        # Install the binary with the latest CUDA version support
-        else \
-            pip install --no-cache-dir torch torchvision; \
-        fi \
-    # Install the CPU binary
-    else \
-        pip install --no-cache-dir torch==$TORCH_VER torchvision==$TORCH_VISION_VER -f https://download.pytorch.org/whl/torch_stable.html; \
-    fi
+# RUN TORCH_VER=1.10.2 && \
+#     TORCH_VISION_VER=0.13.1 && \
+#     if echo "$BASE_IMAGE" | grep -q "cuda:"; then \
+#         # Install CUDA version specific binary when CUDA version is specified as a build arg
+#         if [ "$CUDA_VERSION" ]; then \
+#             pip install --no-cache-dir torch==$TORCH_VER+$CUDA_VERSION torchvision==$TORCH_VISION_VER+$CUDA_VERSION -f https://download.pytorch.org/whl/torch_stable.html; \
+#         # Install the binary with the latest CUDA version support
+#         else \
+#             pip install --no-cache-dir torch torchvision; \
+#         fi \
+#     # Install the CPU binary
+#     else \
+#         pip install --no-cache-dir torch==$TORCH_VER torchvision==$TORCH_VISION_VER -f https://download.pytorch.org/whl/torch_stable.html; \
+#     fi
+
+RUN pip3 install torch torchvision --extra-index-url https://download.pytorch.org/whl/cpu
+
 RUN pip install --no-cache-dir torchtext torchserve torch-model-archiver transformers
 
 ENV PATH="/home/venv/bin:$PATH"
