@@ -16,7 +16,7 @@
 #           https://docs.docker.com/develop/develop-images/build_enhancements/
 
 
-ARG BASE_IMAGE=python:3.6
+ARG BASE_IMAGE=python:3.8
 
 FROM ${BASE_IMAGE} AS compile-image
 ENV PYTHONUNBUFFERED TRUE
@@ -36,12 +36,12 @@ RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 1 \
     && update-alternatives --install /usr/local/bin/pip pip /usr/local/bin/pip3 1
 
 # This is only useful for cuda env
-RUN export USE_CUDA=1
+RUN export USE_CUDA=0
 
 ARG CUDA_VERSION=""
 
-RUN TORCH_VER=$(curl --silent --location https://pypi.org/pypi/torch/json | python -c "import sys, json, pkg_resources; releases = json.load(sys.stdin)['releases']; print(sorted(releases, key=pkg_resources.parse_version)[-1])") && \
-    TORCH_VISION_VER=$(curl --silent --location https://pypi.org/pypi/torchvision/json | python -c "import sys, json, pkg_resources; releases = json.load(sys.stdin)['releases']; print(sorted(releases, key=pkg_resources.parse_version)[-1])") && \
+RUN TORCH_VER=1.10.2 && \
+    TORCH_VISION_VER=0.13.1 && \
     if echo "$BASE_IMAGE" | grep -q "cuda:"; then \
         # Install CUDA version specific binary when CUDA version is specified as a build arg
         if [ "$CUDA_VERSION" ]; then \
@@ -52,7 +52,7 @@ RUN TORCH_VER=$(curl --silent --location https://pypi.org/pypi/torch/json | pyth
         fi \
     # Install the CPU binary
     else \
-        pip install --no-cache-dir torch==$TORCH_VER+cpu torchvision==$TORCH_VISION_VER+cpu -f https://download.pytorch.org/whl/torch_stable.html; \
+        pip install --no-cache-dir torch==$TORCH_VER torchvision==$TORCH_VISION_VER -f https://download.pytorch.org/whl/torch_stable.html; \
     fi
 RUN pip install --no-cache-dir torchtext torchserve torch-model-archiver transformers
 
