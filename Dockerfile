@@ -1,20 +1,5 @@
-# syntax = docker/dockerfile:experimental
-#
-# This file can build images for cpu and gpu env. By default it builds image for CPU.
-# Use following option to build image for cuda/GPU: --build-arg BASE_IMAGE=nvidia/cuda:10.1-cudnn7-runtime-ubuntu18.04
-# Here is complete command for GPU/cuda - 
-# $ DOCKER_BUILDKIT=1 docker build --file Dockerfile --build-arg BASE_IMAGE=nvidia/cuda:10.1-cudnn7-runtime-ubuntu18.04 -t torchserve:latest .
-#
-# Following comments have been shamelessly copied from https://github.com/pytorch/pytorch/blob/master/Dockerfile
-# 
-# NOTE: To build this you will need a docker version > 18.06 with
-#       experimental enabled and DOCKER_BUILDKIT=1
-#
-#       If you do not use buildkit you are not going to have a good time
-#
-#       For reference: 
-#           https://docs.docker.com/develop/develop-images/build_enhancements/
-
+## Docker image to produce a torchServe instance which returns BERT sentence embeddings
+# adapted from https://luiscarlosduarte95.medium.com/creating-your-own-bert-embedding-service-with-torchserve-4b57b591987b
 
 ARG BASE_IMAGE=python:3.8
 
@@ -35,29 +20,9 @@ ENV PATH="/home/venv/bin:$PATH"
 RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 1 \
     && update-alternatives --install /usr/local/bin/pip pip /usr/local/bin/pip3 1
 
-# This is only useful for cuda env
-RUN export USE_CUDA=0
-
-ARG CUDA_VERSION=""
-
-# RUN TORCH_VER=1.10.2 && \
-#     TORCH_VISION_VER=0.13.1 && \
-#     if echo "$BASE_IMAGE" | grep -q "cuda:"; then \
-#         # Install CUDA version specific binary when CUDA version is specified as a build arg
-#         if [ "$CUDA_VERSION" ]; then \
-#             pip install --no-cache-dir torch==$TORCH_VER+$CUDA_VERSION torchvision==$TORCH_VISION_VER+$CUDA_VERSION -f https://download.pytorch.org/whl/torch_stable.html; \
-#         # Install the binary with the latest CUDA version support
-#         else \
-#             pip install --no-cache-dir torch torchvision; \
-#         fi \
-#     # Install the CPU binary
-#     else \
-#         pip install --no-cache-dir torch==$TORCH_VER torchvision==$TORCH_VISION_VER -f https://download.pytorch.org/whl/torch_stable.html; \
-#     fi
-
 RUN pip3 install torch torchvision --extra-index-url https://download.pytorch.org/whl/cpu
 
-RUN pip install --no-cache-dir torchtext torchserve torch-model-archiver transformers
+RUN pip3 install --no-cache-dir torchtext torchserve torch-model-archiver transformers
 
 ENV PATH="/home/venv/bin:$PATH"
 

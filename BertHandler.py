@@ -95,12 +95,11 @@ class TransformersClassifierHandler(BaseHandler, ABC):
         return embeddings
 
     def postprocess(self, inference_output):
-         # TODO: Add any needed post-processing of the model predictions here
-         if len(inference_output[0]) == 1024:
-             response_obj = {'code': 200, 'embeddings': inference_output}
-             print(response_obj)
-             return json.dumps(response_obj)
-         return inference_output
+        if len(inference_output[0]) == 1024:
+            response_obj = {'code': 200, 'embedding': inference_output}
+            print(response_obj)
+            return json.dumps(response_obj)
+        return inference_output
 
 _service = TransformersClassifierHandler()
 
